@@ -1,5 +1,4 @@
 - 👋 Hi, I’m @donuva
-- my quote : "donuva hahaha!"
 - 👀 I’m T-CLC's member
 - 🌱 I’m currently learning in UET
 - 📫 How to reach me ...
