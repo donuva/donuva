@@ -1,4 +1,4 @@
-- 👋 Hi, I’m @donuva
+- 👋 Hi, My name's Đoàn Văn Nguyên
 - 👀 I’m T-CLC's member
 - 🌱 I’m currently learning in UET
 - 📫 How to reach me ...
