@@ -1,4 +1,4 @@
-FROM 172.20.1.22/proxy-cache/ubuntu:22.04
+FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # --- System dependencies for MATLAB Runtime ---
