@@ -3,7 +3,7 @@
 # Based on official MATLAB Runtime R2025a image
 # ==========================================
 
-FROM mathworks/matlab-runtime:r2025a
+FROM mathworks/matlab:r2025a
 
 LABEL maintainer="donuva2" \
       description="Energy Saving 5G Simulation with MATLAB Runtime R2025a" \
