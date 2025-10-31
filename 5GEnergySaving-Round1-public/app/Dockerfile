@@ -17,9 +17,8 @@ RUN apt-get update && apt-get install -y software-properties-common && \
     rm -rf /var/lib/apt/lists/*
 
 
-# --- Install Python dependencies (if needed for pre/post processing) ---
-COPY requirements.txt /tmp/requirements.txt
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt && rm /tmp/requirements.txt
+# --- Install core Python libraries ---
+RUN pip3 install --no-cache-dir --break-system-packages numpy torch
 
 # --- Set working directory ---
 WORKDIR /app
