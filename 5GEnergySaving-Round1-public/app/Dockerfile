@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     libfontconfig1 libxss1 libasound2 \
     python3.10 python3.10-distutils python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt /tmp/requirements.txt
 
 # Install Python dependencies
@@ -18,15 +19,21 @@ RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 WORKDIR /opt/mcr
 
 # --- Download & Install MATLAB Runtime silently ---
-RUN wget -q https://ssd.mathworks.com/supportfiles/downloads/R2025a/Release/0/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2025a_glnxa64.zip \
-    && unzip -q MATLAB_Runtime_R2025a_glnxa64.zip -d mcr_install \
-    && rm MATLAB_Runtime_R2025a_glnxa64.zip \
-    && mcr_install/install -mode silent -agreeToLicense yes -destinationFolder /opt/mcr -logfile /tmp/mcr_log.txt \
-    && rm -rf mcr_install || (echo "MATLAB Runtime install failed. Log:" && cat /tmp/mcr_log.txt && exit 1)
+RUN set -e; \
+    wget -q https://ssd.mathworks.com/supportfiles/downloads/R2025a/Release/0/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2025a_glnxa64.zip; \
+    unzip -q MATLAB_Runtime_R2025a_glnxa64.zip -d /tmp/mcr_install; \
+    rm MATLAB_Runtime_R2025a_glnxa64.zip; \
+    echo "Installing MATLAB Runtime..."; \
+    /tmp/mcr_install/install -mode silent -agreeToLicense yes -destinationFolder /opt/mcr/R2025a -logfile /tmp/mcr_log.txt || { \
+        echo "❌ MATLAB Runtime install failed! Log output:"; \
+        cat /tmp/mcr_log.txt; \
+        exit 1; \
+    }; \
+    echo "✅ MATLAB Runtime installed successfully."; \
+    rm -rf /tmp/mcr_install
 
 # Set correct MATLAB Runtime paths for R2025a
 ENV LD_LIBRARY_PATH=/opt/mcr/R2025a/runtime/glnxa64:/opt/mcr/R2025a/bin/glnxa64:/opt/mcr/R2025a/sys/os/glnxa64:/opt/mcr/R2025a/sys/opengl/lib/glnxa64
-
 
 # Copy compiled MATLAB apps and shell scripts into container
 WORKDIR /app
@@ -53,4 +60,3 @@ ENV DISPLAY=:0.0
 
 # Default command - launches interactive shell with instructions
 CMD ["/app/start.sh"]
-
