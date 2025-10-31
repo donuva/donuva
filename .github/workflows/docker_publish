@@ -28,6 +28,6 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
-        file: simu_5g/5GEnergySaving-Round1-public/app/Dockerfile # or ./Dockerfile
+        file: ./5GEnergySaving-Round1-public/app/Dockerfile # or ./Dockerfile
         push: true
         tags: donuva2/simu_5g
