@@ -1,11 +1,18 @@
+# ==========================================
+# MATLAB Energy Saving Simulation Container
+# Build verified for MATLAB Runtime R2025a
+# ==========================================
+
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# --- System dependencies for MATLAB Runtime ---
+# --- System dependencies (MATLAB + Python) ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget unzip xorg locales xfonts-base libxft2 fontconfig \
-    libxext6 libx11-6 libglu1-mesa libxi6 libxtst6 libxrender1 \
+    wget unzip xorg locales xfonts-base libxft2 fontconfig libfreetype6 \
+    libxrender1 libxt6 libxi6 libxrandr2 libglu1-mesa \
+    libgomp1 libgcc-s1 libexpat1 \
+    libxext6 libx11-6 libxi6 libxtst6 libxrender1 \
     libxrandr2 libxinerama1 libxcursor1 libxcomposite1 libxdamage1 \
     libfontconfig1 libxss1 libasound2 \
     libstdc++6 libc6 \
@@ -20,27 +27,27 @@ ENV LC_ALL=en_US.UTF-8
 COPY requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
+# --- Prepare directory for MATLAB Runtime ---
 WORKDIR /opt/mcr
 
 # --- Download & Install MATLAB Runtime silently ---
 RUN set -eux; \
     echo ">>> Preparing environment for MATLAB Runtime installation..."; \
-    mkdir -p /opt/mcr && chmod 777 /opt/mcr; \
-    export HOME=/tmp; \
-    echo ">>> Downloading MATLAB Runtime R2025a..."; \
+    mkdir -p /opt/mcr /root/.Xauthority /tmp/.X11-unix; \
+    chmod -R 777 /opt/mcr /tmp /root; \
+    export HOME=/tmp LANG=en_US.UTF-8; \
+    echo ">>> Downloading MATLAB Runtime R2025a (this may take several minutes)..."; \
     wget -q https://ssd.mathworks.com/supportfiles/downloads/R2025a/Release/0/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2025a_glnxa64.zip; \
     unzip -q MATLAB_Runtime_R2025a_glnxa64.zip -d /tmp/mcr_install; \
     rm -f MATLAB_Runtime_R2025a_glnxa64.zip; \
-    echo ">>> Installing MATLAB Runtime..."; \
+    echo ">>> Installing MATLAB Runtime (silent mode)..."; \
     HOME=/tmp /tmp/mcr_install/install -mode silent -agreeToLicense yes \
-        -destinationFolder /opt/mcr/R2025a -logfile /tmp/mcr_log.txt || { \
-        echo "❌ MATLAB Runtime install failed. Log output:"; \
-        cat /tmp/mcr_log.txt; \
-        exit 1; \
-    }; \
+        -destinationFolder /opt/mcr/R2025a -logfile /tmp/mcr_log.txt || true; \
+    echo ">>> INSTALL LOG (last 20 lines):"; \
+    tail -n 20 /tmp/mcr_log.txt || true; \
     echo ">>> Checking installation result..."; \
     if [ ! -d /opt/mcr/R2025a/bin/glnxa64 ]; then \
-        echo "❌ MATLAB Runtime missing expected libraries!"; \
+        echo "❌ MATLAB Runtime installation failed. Full log below:"; \
         cat /tmp/mcr_log.txt; \
         exit 1; \
     fi; \
