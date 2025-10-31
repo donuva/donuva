@@ -10,9 +10,12 @@ LABEL maintainer="donuva2" \
       version="1.0"
 
 # --- System update & Python environment ---
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.10 python3.10-distutils python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y python3.10 python3.10-distutils python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
 
 # --- Install Python dependencies (if needed for pre/post processing) ---
 COPY requirements.txt /tmp/requirements.txt
